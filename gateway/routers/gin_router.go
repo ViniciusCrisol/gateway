@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"gateway/gateway"
-
 	"github.com/gin-gonic/gin"
+
+	"github.com/ViniciusCrisol/gateway/gateway"
 )
 
 type GinRouter struct {

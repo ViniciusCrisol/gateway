@@ -1,4 +1,4 @@
-module gateway
+module github.com/ViniciusCrisol/gateway
 
 go 1.22.0
 

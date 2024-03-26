@@ -3,7 +3,7 @@ package routers
 import (
 	"testing"
 
-	"gateway/gateway"
+	"github.com/ViniciusCrisol/gateway/gateway"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"

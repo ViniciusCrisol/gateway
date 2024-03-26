@@ -12,5 +12,5 @@ To integrate the Gateway project with your Golang application, follow the steps 
    You can either clone the repository or install it via a package manager like `go get`.
 
     ```bash
-    go get github.com/ViniciusCrisol/gateway
+    go get github.com/ViniciusCrisol/gateway/gateway
     ```
