@@ -1,6 +1,7 @@
 package gateway
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -77,4 +78,22 @@ func TestRoute_GetFilterProperties(t *testing.T) {
 	filterName, ok = route.GetFilterProperties("Filter3")
 	assert.True(t, ok)
 	assert.Equal(t, expectedFilter3Name, filterName["FilterName"][0])
+}
+
+func TestDeleteCORSHeaders(t *testing.T) {
+	response := http.Response{
+		Header: http.Header{
+			"Access-Control-Allow-Origin":      []string{"*"},
+			"Access-Control-Allow-Methods":     []string{"DELETE, PATCH, POST, GET, PUT"},
+			"Access-Control-Allow-Headers":     []string{"accept, origin, Content-Type, X-CSRF-Token, Authorization, Cache-Control, Content-Length, Accept-Encoding, X-Requested-With"},
+			"Access-Control-Allow-Credentials": []string{"true"},
+		},
+	}
+
+	deleteCORSHeaders(&response)
+
+	assert.Equal(t, "", response.Header.Get("Access-Control-Allow-Origin"))
+	assert.Equal(t, "", response.Header.Get("Access-Control-Allow-Methods"))
+	assert.Equal(t, "", response.Header.Get("Access-Control-Allow-Headers"))
+	assert.Equal(t, "", response.Header.Get("Access-Control-Allow-Credentials"))
 }

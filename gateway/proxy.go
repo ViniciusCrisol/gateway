@@ -11,7 +11,10 @@ func ReverseProxy(route Route, request *http.Request, response http.ResponseWrit
 	if err != nil {
 		return err
 	}
-	reverseProxy := httputil.ReverseProxy{Director: reverseProxyDirector(targetURL)}
+	reverseProxy := httputil.ReverseProxy{
+		Director:       reverseProxyDirector(targetURL),
+		ModifyResponse: reverseProxyResponseModifier,
+	}
 	reverseProxy.ServeHTTP(response, request)
 	return nil
 }
@@ -31,4 +34,18 @@ func reverseProxyDirector(targetURL *url.URL) func(*http.Request) {
 			request.URL.RawQuery = query + "&" + request.URL.RawQuery
 		}
 	}
+}
+
+func reverseProxyResponseModifier(response *http.Response) error {
+	deleteCORSHeaders(response)
+	return nil
+}
+
+// deleteCORSHeaders removes the CORS headers from the proxy response
+// to ensure they don't overwrite headers in the Gateway response
+func deleteCORSHeaders(response *http.Response) {
+	response.Header.Del("Access-Control-Allow-Origin")
+	response.Header.Del("Access-Control-Allow-Methods")
+	response.Header.Del("Access-Control-Allow-Headers")
+	response.Header.Del("Access-Control-Allow-Credentials")
 }
