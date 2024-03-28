@@ -53,5 +53,5 @@ To integrate the Gateway project with your Golang application, follow the steps 
    }
    ```
 
-   Now, when a user sends a request to `localhost:8080/uuid`, the Gateway will initiate a reverse proxy
+   Now, when a user sends a request to `http://localhost:8080/uuid`, the Gateway will initiate a reverse proxy
    to `https://httpbin.org/uuid`, allowing the user to interact with the resource located at that endpoint.
