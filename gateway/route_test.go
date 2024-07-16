@@ -8,47 +8,52 @@ import (
 )
 
 func TestRoute_ValidateWithValidURL(t *testing.T) {
-	route := Route{
-		URL: "https://www.ecommerce.com.br/product_kind?sort=-SKU",
-	}
-	route.Validate()
+	t.Run("It shouldn't panic when the given url is valid", func(t *testing.T) {
+		route := Route{
+			URL: "https://www.ecommerce.com.br/product_kind?sort=-SKU",
+		}
+		route.Validate()
+	})
+
+	t.Run("It should panic when the given url is invalid", func(t *testing.T) {
+		defer func() {
+			assert.NotNil(t, recover())
+		}()
+		route := Route{
+			URL: "https://www.ecommerce.com.br\\product_kind?sort=-SKU",
+		}
+		route.Validate()
+	})
 }
 
-func TestRoute_ValidateWithInvalidURL(t *testing.T) {
-	defer func() {
-		assert.NotNil(t, recover())
-	}()
-	route := Route{
-		URL: "https://www.ecommerce.com.br\\product_kind?sort=-SKU",
-	}
-	route.Validate()
-}
+func TestRoute_GetTargetURL(t *testing.T) {
+	t.Run("It shouldn't return an error when the given url is valid", func(t *testing.T) {
+		var (
+			expectedHost     = "www.ecommerce.com.br"
+			expectedPath     = "/product_kind"
+			expectedScheme   = "https"
+			expectedRawQuery = "sort=-SKU"
+		)
+		route := Route{
+			URL: "https://www.ecommerce.com.br/product_kind?sort=-SKU",
+		}
 
-func TestRoute_GetTargetURLWithValidURL(t *testing.T) {
-	var (
-		expectedHost     = "www.ecommerce.com.br"
-		expectedPath     = "/product_kind"
-		expectedScheme   = "https"
-		expectedRawQuery = "sort=-SKU"
-	)
-	route := Route{
-		URL: "https://www.ecommerce.com.br/product_kind?sort=-SKU",
-	}
-	targetURL, err := route.GetTargetURL()
+		targetURL, err := route.GetTargetURL()
 
-	assert.NoError(t, err)
-	assert.Equal(t, expectedHost, targetURL.Host)
-	assert.Equal(t, expectedPath, targetURL.Path)
-	assert.Equal(t, expectedScheme, targetURL.Scheme)
-	assert.Equal(t, expectedRawQuery, targetURL.RawQuery)
-}
+		assert.NoError(t, err)
+		assert.Equal(t, expectedHost, targetURL.Host)
+		assert.Equal(t, expectedPath, targetURL.Path)
+		assert.Equal(t, expectedScheme, targetURL.Scheme)
+		assert.Equal(t, expectedRawQuery, targetURL.RawQuery)
+	})
 
-func TestRoute_GetTargetURLWithInvalidURL(t *testing.T) {
-	route := Route{
-		URL: "https://www.ecommerce.com.br\\product_kind?sort=-SKU",
-	}
-	_, err := route.GetTargetURL()
-	assert.Error(t, err)
+	t.Run("It should return an error when the given url is invalid", func(t *testing.T) {
+		route := Route{
+			URL: "https://www.ecommerce.com.br\\product_kind?sort=-SKU",
+		}
+		_, err := route.GetTargetURL()
+		assert.Error(t, err)
+	})
 }
 
 func TestRoute_GetFilterProperties(t *testing.T) {
