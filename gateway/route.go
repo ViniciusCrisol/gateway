@@ -1,39 +1,46 @@
 package gateway
 
-import "net/url"
+import (
+	"net/http"
+	"net/url"
+)
 
 type Route struct {
-	URL     string
-	Path    string
-	Method  string
-	Filters []RouteFilter
+	Path      string
+	Method    string
+	TargetURL url.URL
 }
 
-type RouteFilter struct {
-	Name       string
-	Properties map[string][]string
-}
-
-func (route *Route) Validate() {
-	_, err := url.Parse(route.URL)
+func NewRoute(
+	path string,
+	method string,
+	rawTargetURL string,
+) Route {
+	if !IsPathValid(path) {
+		panic("invalid path: " + path)
+	}
+	if !IsMethodValid(method) {
+		panic("invalid method: " + method)
+	}
+	targetURL, err := url.Parse(rawTargetURL)
 	if err != nil {
-		panic("gateway route URL invalid: " + route.URL)
+		panic("invalid target url: " + rawTargetURL)
+	}
+	return Route{
+		Path:      path,
+		Method:    method,
+		TargetURL: *targetURL,
 	}
 }
 
-func (route *Route) GetTargetURL() (*url.URL, error) {
-	targetURL, err := url.Parse(route.URL)
-	if err != nil {
-		return nil, err
-	}
-	return targetURL, nil
+func IsPathValid(path string) bool {
+	return true
 }
 
-func (route *Route) GetFilterProperties(filterName string) (map[string][]string, bool) {
-	for _, filter := range route.Filters {
-		if filter.Name == filterName {
-			return filter.Properties, true
-		}
-	}
-	return nil, false
+func IsMethodValid(method string) bool {
+	return method == http.MethodGet ||
+		method == http.MethodPut ||
+		method == http.MethodPost ||
+		method == http.MethodPatch ||
+		method == http.MethodDelete
 }
