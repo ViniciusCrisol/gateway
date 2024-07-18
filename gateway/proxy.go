@@ -3,6 +3,7 @@ package gateway
 import (
 	"net/http"
 	"net/http/httputil"
+	"net/url"
 )
 
 func ReverseProxy(
@@ -17,14 +18,14 @@ func ReverseProxy(
 			request.URL.Path = route.TargetURL.Path
 			request.URL.Scheme = route.TargetURL.Scheme
 
-			if request.URL.RawQuery != "" && route.TargetURL.RawQuery != "" {
-				request.URL.RawQuery += "&" + route.TargetURL.RawQuery
-				return
+			query := url.Values{}
+			for key, vals := range route.TargetURL.Query() {
+				query.Set(key, vals[0])
 			}
-			if request.URL.RawQuery == "" && route.TargetURL.RawQuery != "" {
-				request.URL.RawQuery = route.TargetURL.RawQuery
-				return
+			for key, vals := range request.URL.Query() {
+				query.Set(key, vals[0])
 			}
+			request.URL.RawQuery = query.Encode()
 		},
 		ModifyResponse: func(response *http.Response) error {
 			response.Header.Del("Access-Control-Max-Age")
